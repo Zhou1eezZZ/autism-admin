@@ -46,7 +46,7 @@ export const constantRouterMap = [
         path: 'userList',
         name: '用户列表',
         component: () => import('@/views/management/user/list'),
-        meta: { title: '用户列表', icon: 'table' }
+        meta: { title: '用户列表', icon: 'user' }
       }
     ]
   },

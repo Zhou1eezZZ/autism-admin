@@ -1,20 +1,37 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name:{{ name }}</div>
-    <div class="dashboard-text">roles:<span v-for="role in roles" :key="role">{{ role }}</span></div>
+    <el-card style="text-align:center">
+      <div slot="header" style="text-align:left;">
+        <span style="font-size:1.8rem;font-weight:bold">我的信息</span>
+      </div>
+      <transition name="fade" mode="out-in" appear>
+        <user-form :is-editable.sync="editable" @changeEditState="changeEditState"/>
+      </transition>
+    </el-card>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import userForm from './components/UserForm'
 
 export default {
   name: 'Dashboard',
+  data() {
+    return {
+      editable: false
+    }
+  },
   computed: {
-    ...mapGetters([
-      'name',
-      'roles'
-    ])
+    ...mapGetters(['name', 'roles'])
+  },
+  components: {
+    userForm
+  },
+  methods: {
+    changeEditState(state) {
+      this.editable = state
+    }
   }
 }
 </script>

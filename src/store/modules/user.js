@@ -113,7 +113,8 @@ const user = {
     },
 
     // 获取用户信息
-    GetInfo({ commit, userInfo }) {
+    UpdateInfo({ commit }, userInfo) {
+      // debugger
       return new Promise((resolve, reject) => {
         UserAPI.userUpdate(userInfo).then(response => {
           if (response && response.data && response.data.successful) {
