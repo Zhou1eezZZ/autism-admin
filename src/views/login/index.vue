@@ -74,7 +74,7 @@ export default {
     handleLogin() {
       this.loading = true
       this.$store.dispatch('Login', this.loginForm).then(response => {
-        debugger
+        // debugger
         if (response && response.data && response.data.successful) {
           this.$message({
             type: 'success',
