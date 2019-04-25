@@ -7,7 +7,6 @@
       :model="userData"
       label-position="right"
       label-width="125px"
-      style="overflow:hidden"
     >
       <el-form-item prop="uuid" label="用户ID">
         <el-input v-model="userData.uuid" disabled/>

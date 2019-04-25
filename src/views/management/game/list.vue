@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <el-card>
-      <el-button type="primary">
+      <el-button type="primary" @click="handleAdd">
         <i class="el-icon-plus"></i> 新增
       </el-button>
       <el-table v-loading="listLoading" :data="gameList" fit style="margin-top:20px">
@@ -33,7 +33,7 @@
             <span>{{scope.row.name}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="开发者ID" align="center">
+        <el-table-column label="开发者ID" align="center" width="280px">
           <template slot-scope="scope">
             <span>{{scope.row.devId}}</span>
           </template>
@@ -51,8 +51,8 @@
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <div v-if="$store.state.user.type==='0' || scope.row.devId === $store.state.user.uuid">
-              <el-button type="text">编辑</el-button>
-              <el-button type="text" class="danger">删除</el-button>
+              <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button type="text" class="danger" @click="deleteGame(scope.row)">删除</el-button>
             </div>
             <el-button v-else type="text" disabled>无权限</el-button>
           </template>
@@ -67,12 +67,28 @@
         style="margin-top:20px"
       />
     </el-card>
+    <el-dialog
+      :visible.sync="showDialog"
+      :title="dialogTitle"
+      :before-close="handleClose"
+      style="text-align:center"
+    >
+      <game-info-form
+        ref="gameForm"
+        :data="tmpData"
+        :is-created="dialogTitle!=='新增游戏'"
+        @add="addGame"
+        @update="updateGame"
+        @close="handleClose"
+       />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Pagination from '@/components/Pagination'
 import GameAPI from '@/api/game'
+import GameInfoForm from './components/gameInfoForm'
 export default {
   data() {
     return {
@@ -82,10 +98,13 @@ export default {
         pageSize: 10
       },
       total: 0,
-      listLoading: false
+      listLoading: false,
+      dialogTitle: '',
+      showDialog: false,
+      tmpData: {}
     }
   },
-  components: { Pagination },
+  components: { Pagination, GameInfoForm },
   created() {
     this.getList()
   },
@@ -98,10 +117,10 @@ export default {
           // debugger
           this.gameList = res.data.data.list
           this.total = res.data.data.total
-          vm.$message({
-            type: 'success',
-            message: '游戏表加载成功'
-          })
+          // vm.$message({
+          //   type: 'success',
+          //   message: '游戏表加载成功'
+          // })
         } else {
           vm.$message({
             type: 'error',
@@ -110,6 +129,79 @@ export default {
         }
       })
       this.listLoading = false
+    },
+    handleAdd() {
+      this.dialogTitle = '新增游戏'
+      this.showDialog = true
+      this.$set(this.tmpData, 'devId', this.$store.state.user.uuid)
+    },
+    handleEdit(row) {
+      this.dialogTitle = '编辑游戏'
+      this.showDialog = true
+      this.tmpData = Object.assign({}, row)
+    },
+    handleClose() {
+      this.tmpData = {}
+      this.showDialog = false
+      // debugger
+      this.$refs.gameForm.$refs.gameInfoData.resetFields()
+    },
+    async addGame(data) {
+      const vm = this
+      await GameAPI.addGame(data).then(res => {
+        if (res && res.data && res.data.successful) {
+          vm.$message({
+            type: 'success',
+            message: '游戏新增成功'
+          })
+          vm.getList()
+        } else {
+          vm.$message({
+            type: 'error',
+            message: res.data.statusMessage
+          })
+        }
+      })
+      this.handleClose()
+    },
+    async updateGame(data) {
+      const vm = this
+      await GameAPI.updateGame(data).then(res => {
+        if (res && res.data && res.data.successful) {
+          vm.$message({
+            type: 'success',
+            message: '游戏更新成功'
+          })
+          vm.getList()
+        } else {
+          vm.$message({
+            type: 'error',
+            message: res.data.statusMessage
+          })
+        }
+      })
+      this.handleClose()
+    },
+    deleteGame(row) {
+      const vm = this
+      this.$confirm('是否确认删除该游戏', '提示', {
+        type: 'warning'
+      }).then(() => {
+        GameAPI.delGame(row).then(res => {
+          if (res && res.data && res.data.successful) {
+            vm.$message({
+              type: 'success',
+              message: '删除游戏成功'
+            })
+            vm.getList()
+          } else {
+            vm.$message({
+              type: 'error',
+              message: res.data.statusMessage
+            })
+          }
+        })
+      }).catch()
     }
   }
 }

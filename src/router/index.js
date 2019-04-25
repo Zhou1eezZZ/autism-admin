@@ -41,6 +41,7 @@ export const constantRouterMap = [
   {
     path: '/user',
     component: Layout,
+    roles: ['0'],
     children: [
       {
         path: 'userList',
@@ -54,6 +55,7 @@ export const constantRouterMap = [
   {
     path: '/game',
     component: Layout,
+    roles: ['0', '1', '2', '3', '4'],
     children: [
       {
         path: 'gameList',
@@ -67,6 +69,7 @@ export const constantRouterMap = [
   {
     path: '/organ',
     component: Layout,
+    roles: ['0', '1', '2', '3', '4'],
     children: [
       {
         path: 'organList',
@@ -80,12 +83,27 @@ export const constantRouterMap = [
   {
     path: '/intervention',
     component: Layout,
+    roles: ['0', '4'],
     children: [
       {
         path: 'interventionList',
         name: '干预日志列表',
         component: () => import('@/views/management/intervention/list'),
         meta: { title: '干预日志列表', icon: 'link' }
+      }
+    ]
+  },
+
+  {
+    path: '/gameLog',
+    component: Layout,
+    roles: ['0', '4'],
+    children: [
+      {
+        path: 'gameLogList',
+        name: '用户游戏日志列表',
+        component: () => import('@/views/management/gameLog/list'),
+        meta: { title: '用户游戏日志列表', icon: 'link' }
       }
     ]
   },

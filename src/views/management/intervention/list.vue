@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <el-card>
-      <el-button v-if="$store.state.user.type==='0'||$store.state.user.type==='4'" type="primary">
+      <el-button v-if="$store.state.user.type==='0'||$store.state.user.type==='4'" type="primary"  @click="handleAdd">
         <i class="el-icon-plus"></i> 新增
       </el-button>
       <el-table v-loading="listLoading" :data="interventionList" fit style="margin-top:20px">
@@ -32,9 +32,15 @@
         <el-table-column label="干预状态" align="center">
           <template slot-scope="scope">
             <!-- <span>{{scope.row.state|filterByDic(interventionDic)}}</span> -->
-            <el-tag v-if="scope.row.state === '2'"><span>{{scope.row.state|filterByDic(interventionDic)}}</span></el-tag>
-            <el-tag v-if="scope.row.state === '1'" type="info"><span>{{scope.row.state|filterByDic(interventionDic)}}</span></el-tag>
-            <el-tag v-if="scope.row.state === '3'" type="success"><span>{{scope.row.state|filterByDic(interventionDic)}}</span></el-tag>
+            <el-tag v-if="scope.row.state === '2'">
+              <span>{{scope.row.state|filterByDic(interventionDic)}}</span>
+            </el-tag>
+            <el-tag v-if="scope.row.state === '1'" type="info">
+              <span>{{scope.row.state|filterByDic(interventionDic)}}</span>
+            </el-tag>
+            <el-tag v-if="scope.row.state === '3'" type="success">
+              <span>{{scope.row.state|filterByDic(interventionDic)}}</span>
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="干预开始时间" align="center">
@@ -44,7 +50,7 @@
         </el-table-column>
         <el-table-column label="干预结束时间" align="center">
           <template slot-scope="scope">
-            <span v-if="scope.row.state === '3'">{{scope.row.endTime|formatDate('yyyy-MM-dd')}}</span>
+            <span v-if="scope.row.state === '3' && scope.row.endTime!==0">{{scope.row.endTime|formatDate('yyyy-MM-dd')}}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -53,10 +59,13 @@
             <span>{{scope.row.updateTime*1000|formatDate('yyyy-MM-dd')}}</span>
           </template>
         </el-table-column>
-        <el-table-column  label="操作" fixed="right" align="center">
+        <el-table-column label="操作" fixed="right" align="center">
           <template slot-scope="scope">
-            <el-button type="text">编辑</el-button>
-            <el-button type="text" class="danger">删除</el-button>
+            <div v-if="$store.state.user.uuid === scope.row.interventionistId || $store.state.user.type === '0'">
+              <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button type="text" class="danger" @click="deleteInter(scope.row)">删除</el-button>
+            </div>
+            <span v-else>无权限</span>
           </template>
         </el-table-column>
       </el-table>
@@ -69,6 +78,21 @@
         style="margin-top:20px"
       />
     </el-card>
+    <el-dialog
+      :visible.sync="showDialog"
+      :title="dialogTitle"
+      :before-close="handleClose"
+      style="text-align:center"
+    >
+      <inter-info-form
+        ref="interForm"
+        :data="tmpData"
+        :is-created="dialogTitle!=='新增干预报告'"
+        @add="addInter"
+        @update="updateInter"
+        @close="handleClose"
+       />
+    </el-dialog>
   </div>
 </template>
 
@@ -76,6 +100,7 @@
 import Pagination from '@/components/Pagination'
 import AsscessAPI from '@/api/asscess'
 import interventionDic from '@/utils/dic/interventionState'
+import InterInfoForm from './components/interInfoForm'
 export default {
   data() {
     return {
@@ -86,10 +111,13 @@ export default {
       },
       total: 0,
       listLoading: false,
-      interventionDic: interventionDic
+      interventionDic: interventionDic,
+      dialogTitle: '',
+      showDialog: false,
+      tmpData: {}
     }
   },
-  components: { Pagination },
+  components: { Pagination, InterInfoForm },
   filters: {
     filterByDic(val, dic) {
       // debugger
@@ -110,10 +138,10 @@ export default {
           // debugger
           this.interventionList = res.data.data.list
           this.total = res.data.data.total
-          vm.$message({
-            type: 'success',
-            message: '干预报告表加载成功'
-          })
+          // vm.$message({
+          //   type: 'success',
+          //   message: '干预报告表加载成功'
+          // })
         } else {
           vm.$message({
             type: 'error',
@@ -122,6 +150,79 @@ export default {
         }
       })
       this.listLoading = false
+    },
+    handleAdd() {
+      this.dialogTitle = '新增干预报告'
+      this.showDialog = true
+      this.$set(this.tmpData, 'interventionistId', this.$store.state.user.uuid)
+    },
+    handleEdit(row) {
+      this.dialogTitle = '编辑干预报告'
+      this.showDialog = true
+      this.tmpData = Object.assign({}, row)
+    },
+    handleClose() {
+      this.tmpData = {}
+      this.showDialog = false
+      // debugger
+      this.$refs.interForm.$refs.interInfoData.resetFields()
+    },
+    async addInter(data) {
+      const vm = this
+      await AsscessAPI.addAsscess(data).then(res => {
+        if (res && res.data && res.data.successful) {
+          vm.$message({
+            type: 'success',
+            message: '干预报告新增成功'
+          })
+          vm.getList()
+        } else {
+          vm.$message({
+            type: 'error',
+            message: res.data.statusMessage
+          })
+        }
+      })
+      this.handleClose()
+    },
+    async updateInter(data) {
+      const vm = this
+      await AsscessAPI.updateAsscess(data).then(res => {
+        if (res && res.data && res.data.successful) {
+          vm.$message({
+            type: 'success',
+            message: '干预报告更新成功'
+          })
+          vm.getList()
+        } else {
+          vm.$message({
+            type: 'error',
+            message: res.data.statusMessage
+          })
+        }
+      })
+      this.handleClose()
+    },
+    deleteInter(row) {
+      const vm = this
+      this.$confirm('是否确认删除该干预报告', '提示', {
+        type: 'warning'
+      }).then(() => {
+        AsscessAPI.delAsscess(row).then(res => {
+          if (res && res.data && res.data.successful) {
+            vm.$message({
+              type: 'success',
+              message: '删除干预报告成功'
+            })
+            vm.getList()
+          } else {
+            vm.$message({
+              type: 'error',
+              message: res.data.statusMessage
+            })
+          }
+        })
+      }).catch()
     }
   }
 }

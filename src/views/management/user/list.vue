@@ -1,9 +1,9 @@
 <template>
   <div class="page-container">
     <el-card>
-      <el-button type="primary">
+      <!-- <el-button type="primary" @click="handleAdd">
         <i class="el-icon-plus"></i> 新增
-      </el-button>
+      </el-button> -->
       <el-table v-loading="listLoading" :data="userList" fit style="margin-top:20px">
         <el-table-column type="expand">
           <template slot-scope="props">
@@ -75,11 +75,12 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text">编辑</el-button>
+            <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button
               type="text"
               :class="{danger:scope.row.type!=='0'}"
               :disabled="scope.row.type==='0'"
+              @click="deleteUser(scope.row)"
             >删除</el-button>
           </template>
         </el-table-column>
@@ -93,6 +94,21 @@
         style="margin-top:20px"
       />
     </el-card>
+    <el-dialog
+      :visible.sync="showDialog"
+      :title="dialogTitle"
+      :before-close="handleClose"
+      style="text-align:center;padding: 0 20px"
+    >
+      <user-info-form
+        ref="userForm"
+        :data="tmpData"
+        :is-created="dialogTitle!=='新增用户'"
+        @add="addUser"
+        @update="updateUser"
+        @close="handleClose"
+       />
+    </el-dialog>
   </div>
 </template>
 
@@ -102,6 +118,7 @@ import Pagination from '@/components/Pagination'
 import userDic from '@/utils/dic/user'
 import sexDic from '@/utils/dic/sex'
 import nationDic from '@/utils/dic/nation'
+import UserInfoForm from './components/userInfoForm'
 export default {
   data() {
     return {
@@ -114,10 +131,13 @@ export default {
       listLoading: false,
       userDic: userDic,
       sexDic: sexDic,
-      nationDic: nationDic
+      nationDic: nationDic,
+      dialogTitle: '',
+      showDialog: false,
+      tmpData: {}
     }
   },
-  components: { Pagination },
+  components: { Pagination, UserInfoForm },
   filters: {
     filterByDic(val, dic) {
       // debugger
@@ -138,10 +158,10 @@ export default {
           // debugger
           this.userList = res.data.data.list
           this.total = res.data.data.total
-          vm.$message({
-            type: 'success',
-            message: '用户表加载成功'
-          })
+          // vm.$message({
+          //   type: 'success',
+          //   message: '用户表加载成功'
+          // })
         } else {
           vm.$message({
             type: 'error',
@@ -150,6 +170,80 @@ export default {
         }
       })
       this.listLoading = false
+    },
+    handleAdd() {
+      this.dialogTitle = '新增用户'
+      this.showDialog = true
+      this.$set(this.tmpData, 'type', '1')
+    },
+    handleEdit(row) {
+      this.dialogTitle = '编辑用户'
+      this.showDialog = true
+      this.tmpData = Object.assign({}, row)
+    },
+    handleClose() {
+      this.tmpData = {}
+      this.showDialog = false
+      // debugger
+      this.$refs.userForm.$refs.userInfoData.resetFields()
+    },
+    // TODO addUser
+    async addUser(data) {
+      const vm = this
+      await UserAPI.userLogin(data).then(res => {
+        if (res && res.data && res.data.successful) {
+          debugger
+          vm.getList()
+        } else {
+          vm.$message({
+            type: 'error',
+            message: res.data.statusMessage
+          })
+        }
+      })
+      this.handleClose()
+    },
+    async updateUser(data) {
+      const vm = this
+      this.$delete(data, 'updateTime')
+      this.$delete(data, 'phone')
+      await UserAPI.userUpdate(data).then(res => {
+        if (res && res.data && res.data.successful) {
+          vm.$message({
+            type: 'success',
+            message: '用户信息更新成功'
+          })
+          vm.getList()
+        } else {
+          vm.$message({
+            type: 'error',
+            message: res.data.statusMessage
+          })
+        }
+      })
+      this.handleClose()
+    },
+    deleteUser(row) {
+      const vm = this
+      this.$confirm('是否确认删除该用户', '提示', {
+        type: 'warning'
+      }).then(() => {
+        // debugger
+        UserAPI.userDelete(row).then(res => {
+          if (res && res.data && res.data.successful) {
+            vm.$message({
+              type: 'success',
+              message: '删除用户成功'
+            })
+            vm.getList()
+          } else {
+            vm.$message({
+              type: 'error',
+              message: res.data.statusMessage
+            })
+          }
+        })
+      }).catch()
     }
   }
 }

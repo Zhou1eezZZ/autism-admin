@@ -8,9 +8,9 @@ export function userSignUp(data) { // 注册
   })
 }
 
-export function userDelete(id) {
+export function userDelete(data) {
   return request({
-    url: `/autismAPI/user/delete?uuid=${id}`,
+    url: `/autismAPI/user/delete?uuid=${data.uuid}`,
     method: 'delete'
 
   })
