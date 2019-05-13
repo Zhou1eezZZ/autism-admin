@@ -81,7 +81,6 @@ export default {
             message: '登录成功',
             duration: 1000
           })
-          this.loading = false
           this.$router.push({ path: this.redirect || '/' })
           // this.$router.push({ path: '/dashboard' })
         } else {
@@ -92,8 +91,8 @@ export default {
           })
         }
       }).catch(() => {
-        this.loading = false
       })
+      this.loading = false
     }
   }
 }

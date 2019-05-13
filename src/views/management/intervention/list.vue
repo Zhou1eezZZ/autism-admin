@@ -19,14 +19,14 @@
             <span>{{scope.$index+1}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="患者ID" align="center" width="280px">
+        <el-table-column label="患者" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.interventionId}}</span>
+            <span>{{scope.row.patient.realName}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="治疗师ID" align="center" width="280px">
+        <el-table-column label="治疗师" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.interventionistId}}</span>
+            <span>{{scope.row.docter.realName}}</span>
           </template>
         </el-table-column>
         <el-table-column label="干预状态" align="center">

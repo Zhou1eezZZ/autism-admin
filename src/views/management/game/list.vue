@@ -33,9 +33,9 @@
             <span>{{scope.row.name}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="开发者ID" align="center" width="280px">
+        <el-table-column label="开发者" align="center" width="280px">
           <template slot-scope="scope">
-            <span>{{scope.row.devId}}</span>
+            <span>{{scope.row.createUser.name}}</span>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center">

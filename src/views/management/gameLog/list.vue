@@ -24,14 +24,14 @@
             <span>{{scope.row.uuid}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="游戏ID" align="center" width="280px">
+        <el-table-column label="游戏" align="center" width="200px">
           <template slot-scope="scope">
-            <span>{{scope.row.gameId}}</span>
+            <span>{{scope.row.game.name}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="玩家ID" align="center" width="280px">
+        <el-table-column label="玩家" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.userId}}</span>
+            <span>{{scope.row.user.realName}}</span>
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center">

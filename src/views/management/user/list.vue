@@ -3,11 +3,11 @@
     <el-card>
       <!-- <el-button type="primary" @click="handleAdd">
         <i class="el-icon-plus"></i> 新增
-      </el-button> -->
+      </el-button>-->
       <el-table v-loading="listLoading" :data="userList" fit style="margin-top:20px">
         <el-table-column type="expand">
           <template slot-scope="props">
-            <el-form label-position="left" >
+            <el-form label-position="left">
               <el-form-item label="用户 ID">
                 <span>{{ props.row.uuid }}</span>
               </el-form-item>
@@ -73,9 +73,10 @@
             <span>{{scope.row.updateTime*1000|formatDate('yyyy-MM-dd')}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" min-width="130">
           <template slot-scope="scope">
             <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button type="text" @click="resetPsw(scope.row)">重置密码</el-button>
             <el-button
               type="text"
               :class="{danger:scope.row.type!=='0'}"
@@ -107,7 +108,7 @@
         @add="addUser"
         @update="updateUser"
         @close="handleClose"
-       />
+      />
     </el-dialog>
   </div>
 </template>
@@ -227,13 +228,41 @@ export default {
       const vm = this
       this.$confirm('是否确认删除该用户', '提示', {
         type: 'warning'
+      })
+        .then(() => {
+          // debugger
+          UserAPI.userDelete(row).then(res => {
+            if (res && res.data && res.data.successful) {
+              vm.$message({
+                type: 'success',
+                message: '删除用户成功'
+              })
+              vm.getList()
+            } else {
+              vm.$message({
+                type: 'error',
+                message: res.data.statusMessage
+              })
+            }
+          })
+        })
+        .catch()
+    },
+    resetPsw(row) {
+      const vm = this
+      this.$confirm('是否将该用户密码重置为123456', '提示', {
+        type: 'warning'
       }).then(() => {
-        // debugger
-        UserAPI.userDelete(row).then(res => {
+        const data = {
+          uuid: row.uuid,
+          newPsd: '123456',
+          updateUserType: this.$store.state.user.type
+        }
+        UserAPI.pswUpdate(data).then(res => {
           if (res && res.data && res.data.successful) {
             vm.$message({
               type: 'success',
-              message: '删除用户成功'
+              message: '重置密码成功'
             })
             vm.getList()
           } else {
@@ -243,7 +272,7 @@ export default {
             })
           }
         })
-      }).catch()
+      })
     }
   }
 }
