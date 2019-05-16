@@ -15,11 +15,11 @@
             <span>{{scope.row.name}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="机构ID" align="center" width="280px">
+        <!-- <el-table-column label="机构ID" align="center" width="280px">
           <template slot-scope="scope">
             <span>{{scope.row.uuid}}</span>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="所在地" align="center">
           <template slot-scope="scope">
             <span>{{scope.row.localtion}}</span>

@@ -1,9 +1,9 @@
 <template>
   <div class="page-container">
     <el-card>
-      <!-- <el-button type="primary" @click="handleAdd">
+      <el-button type="primary" @click="handleAdd">
         <i class="el-icon-plus"></i> 新增
-      </el-button>-->
+      </el-button>
       <el-table v-loading="listLoading" :data="userList" fit style="margin-top:20px">
         <el-table-column type="expand">
           <template slot-scope="props">
@@ -53,7 +53,7 @@
             <span>{{scope.row.phone}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="邮箱" align="center">
+        <el-table-column label="邮箱" align="center" width="200px">
           <template slot-scope="scope">
             <span>{{scope.row.email}}</span>
           </template>
@@ -73,7 +73,7 @@
             <span>{{scope.row.updateTime*1000|formatDate('yyyy-MM-dd')}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" min-width="130">
+        <el-table-column label="操作" align="center" min-width="130" fixed="right">
           <template slot-scope="scope">
             <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="text" @click="resetPsw(scope.row)">重置密码</el-button>
@@ -191,9 +191,14 @@ export default {
     // TODO addUser
     async addUser(data) {
       const vm = this
-      await UserAPI.userLogin(data).then(res => {
+      this.$set(data, 'password', '123456')
+      await UserAPI.userSignUp(data).then(res => {
         if (res && res.data && res.data.successful) {
-          debugger
+          // debugger
+          vm.$message({
+            type: 'success',
+            message: '添加用户成功'
+          })
           vm.getList()
         } else {
           vm.$message({
