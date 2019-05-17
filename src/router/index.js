@@ -30,11 +30,13 @@ export const constantRouterMap = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+    roles: ['0', '1', '2', '3', '4'],
     name: 'Dashboard',
     hidden: true,
     children: [{
       path: 'dashboard',
-      component: () => import('@/views/dashboard/index')
+      component: () => import('@/views/dashboard/index'),
+      meta: { roles: ['0', '1', '2', '3', '4'] }
     }]
   },
 
@@ -47,7 +49,7 @@ export const constantRouterMap = [
         path: 'userList',
         name: '用户列表',
         component: () => import('@/views/management/user/list'),
-        meta: { title: '用户列表', icon: 'user' }
+        meta: { title: '用户列表', icon: 'user', roles: ['0'] }
       }
     ]
   },
@@ -61,7 +63,7 @@ export const constantRouterMap = [
         path: 'gameList',
         name: '游戏列表',
         component: () => import('@/views/management/game/list'),
-        meta: { title: '游戏列表', icon: 'form' }
+        meta: { title: '游戏列表', icon: 'form', roles: ['0', '1', '2', '3', '4'] }
       }
     ]
   },
@@ -75,7 +77,7 @@ export const constantRouterMap = [
         path: 'organList',
         name: '机构列表',
         component: () => import('@/views/management/organ/list'),
-        meta: { title: '机构列表', icon: 'nested' }
+        meta: { title: '机构列表', icon: 'nested', roles: ['0', '1', '2', '3', '4'] }
       }
     ]
   },
@@ -89,7 +91,7 @@ export const constantRouterMap = [
         path: 'interventionList',
         name: '干预日志列表',
         component: () => import('@/views/management/intervention/list'),
-        meta: { title: '干预日志列表', icon: 'link' }
+        meta: { title: '干预日志列表', icon: 'link', roles: ['0', '4'] }
       }
     ]
   },
@@ -103,7 +105,7 @@ export const constantRouterMap = [
         path: 'gameLogList',
         name: '用户游戏日志列表',
         component: () => import('@/views/management/gameLog/list'),
-        meta: { title: '用户游戏日志列表', icon: 'link' }
+        meta: { title: '用户游戏日志列表', icon: 'link', roles: ['0', '4'] }
       }
     ]
   },

@@ -34,6 +34,23 @@ Object.keys(filters).forEach(key => {
 
 Vue.config.productionTip = false
 
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    next()
+  } else {
+    // debugger
+    if (!store.state.user.isLogin && from.path !== '/login') {
+      next({ path: '/login' })
+    } else {
+      if (to.meta && to.meta.roles && to.meta.roles.indexOf(store.state.user.type) !== -1) {
+        next()
+      } else {
+        next({ path: from.path })
+      }
+    }
+  }
+})
+
 new Vue({
   el: '#app',
   router,
