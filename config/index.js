@@ -11,7 +11,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/autismAPI': {
-        target: 'http://62.234.41.45:8080/autism-0.0.1-SNAPSHOT',
+        target: 'http://159.75.20.239:8080/autism2020',
         changeOrigin: true,
         pathRewrite: {
           '^/autismAPI': ''

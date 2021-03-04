@@ -120,6 +120,7 @@ export default {
       if (this.isCreated) {
         this.$emit('update', this.data)
       } else {
+        !this.data.deptId&&(this.data.deptId=0)
         this.$emit('add', this.data)
       }
     },

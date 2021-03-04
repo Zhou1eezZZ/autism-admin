@@ -12,22 +12,22 @@
                 <span>{{ props.row.uuid }}</span>
               </el-form-item>
               <el-form-item label="真实姓名">
-                <span v-if="props.row.realName">{{ props.row.realName }}</span>
+                <span v-if="props.row.realName">{{ props.row.realName==='0'?'-':props.row.realName }}</span>
                 <span v-else>未填写</span>
               </el-form-item>
               <el-form-item label="地址">
-                <span v-if="props.row.address">{{ props.row.address }}</span>
+                <span v-if="props.row.address">{{ props.row.address==='0'?'-':props.row.address }}</span>
                 <span v-else>未填写</span>
               </el-form-item>
               <div v-if="props.row.type === '4'">
                 <el-form-item label="所属机构">
-                  <span>{{ props.row.deptId }}</span>
+                  <span>{{ props.row.deptId==='0'?'-':props.row.deptId }}</span>
                 </el-form-item>
                 <el-form-item label="从业时间">
                   <span>{{ props.row.workTime|formatDate('yyyy-MM-dd') }}</span>
                 </el-form-item>
                 <el-form-item label="干预师资格认证号">
-                  <span>{{ props.row.qualificationNumber }}</span>
+                  <span>{{ props.row.qualificationNumber==='0'?'-':props.row.qualificationNumber }}</span>
                 </el-form-item>
               </div>
             </el-form>
@@ -45,7 +45,7 @@
         </el-table-column>
         <el-table-column label="用户类型" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.type|filterByDic(userDic)}}</span>
+            <span>{{filterByDic(scope.row.type,userDic)}}</span>
           </template>
         </el-table-column>
         <el-table-column label="手机号" align="center">
@@ -55,17 +55,17 @@
         </el-table-column>
         <el-table-column label="邮箱" align="center" width="200px">
           <template slot-scope="scope">
-            <span>{{scope.row.email}}</span>
+            <span>{{scope.row.email?scope.row.email:'-'}}</span>
           </template>
         </el-table-column>
         <el-table-column label="性别" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.sex|filterByDic(sexDic)}}</span>
+            <span>{{filterByDic(scope.row.sex,sexDic)}}</span>
           </template>
         </el-table-column>
         <el-table-column label="民族" align="center">
           <template slot-scope="scope">
-            <span>{{scope.row.nation|filterByDic(nationDic)}}</span>
+            <span>{{filterByDic(scope.row.nation,nationDic)}}</span>
           </template>
         </el-table-column>
         <el-table-column label="更新时间" align="center">
@@ -139,18 +139,14 @@ export default {
     }
   },
   components: { Pagination, UserInfoForm },
-  filters: {
-    filterByDic(val, dic) {
-      // debugger
-      if (val && dic) {
-        return dic.find(e => e.value === val).label
-      }
-    }
-  },
+  filters: {},
   created() {
     this.getList()
   },
   methods: {
+    filterByDic(val, dic) {
+      return val === '0' ? '-' : dic.find(e => e.value === val).label
+    },
     async getList() {
       this.listLoading = true
       const vm = this
@@ -161,7 +157,7 @@ export default {
           this.total = res.data.data.total
           // vm.$message({
           //   type: 'success',
-          //   message: '用户表加载成功'
+          //   message: '用户表加载成功
           // })
         } else {
           vm.$message({

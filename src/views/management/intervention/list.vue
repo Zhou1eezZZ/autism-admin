@@ -31,15 +31,14 @@
         </el-table-column>
         <el-table-column label="干预状态" align="center">
           <template slot-scope="scope">
-            <!-- <span>{{scope.row.state|filterByDic(interventionDic)}}</span> -->
             <el-tag v-if="scope.row.state === '2'">
-              <span>{{scope.row.state|filterByDic(interventionDic)}}</span>
+              <span>{{filterByDic(scope.row.state,interventionDic)}}</span>
             </el-tag>
             <el-tag v-if="scope.row.state === '1'" type="info">
-              <span>{{scope.row.state|filterByDic(interventionDic)}}</span>
+              <span>{{filterByDic(scope.row.state,interventionDic)}}</span>
             </el-tag>
             <el-tag v-if="scope.row.state === '3'" type="success">
-              <span>{{scope.row.state|filterByDic(interventionDic)}}</span>
+              <span>{{filterByDic(scope.row.state,interventionDic)}}</span>
             </el-tag>
           </template>
         </el-table-column>
@@ -118,18 +117,14 @@ export default {
     }
   },
   components: { Pagination, InterInfoForm },
-  filters: {
-    filterByDic(val, dic) {
-      // debugger
-      if (val && dic) {
-        return dic.find(e => e.value === val).label
-      }
-    }
-  },
+  filters: {},
   created() {
     this.getList()
   },
   methods: {
+    filterByDic(val, dic) {
+      return val === '0' ? '-' : dic.find(e => e.value === val).label
+    },
     async getList() {
       this.listLoading = true
       const vm = this
@@ -169,6 +164,8 @@ export default {
     },
     async addInter(data) {
       const vm = this
+      data.startTime = data.startTime/1000
+      data.endTime = data.endTime/1000
       await AsscessAPI.addAsscess(data).then(res => {
         if (res && res.data && res.data.successful) {
           vm.$message({
